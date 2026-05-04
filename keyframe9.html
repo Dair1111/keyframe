@@ -1,0 +1,651 @@
+<link rel="stylesheet" href="https://use.typekit.net/vmf7suz.css">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#app {
+  font-family: 'area-normal', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--color-text-primary);
+  padding: 20px 20px 40px;
+}
+#app, #app * {
+  font-family: 'area-normal', sans-serif;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+button:focus { outline: none; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  margin-bottom: 16px;
+}
+#topbar-title {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-primary);
+}
+#about-btn {
+  font-size: 11px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+#about-btn:hover { opacity: 0.4; }
+
+#about-panel {
+  position: fixed;
+  top: 0;
+  right: -340px;
+  width: 320px;
+  height: 100vh;
+  background: var(--color-background-primary, #fff);
+  border-left: 0.5px solid var(--color-border-tertiary);
+  padding: 32px 28px;
+  z-index: 100;
+  transition: right 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#about-panel.open { right: 0; }
+#about-panel p {
+  font-size: 11px;
+  line-height: 1.9;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+}
+
+#about-close-btn {
+  align-self: flex-end;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  line-height: 1;
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+#about-close-btn:hover { opacity: 0.4; }
+
+
+
+#studio {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
+}
+#left { width: 52%; flex-shrink: 0; display: flex; flex-direction: column; }
+#right { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+#video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  overflow: hidden;
+  user-select: none;
+}
+#main-video {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+#key-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+#sample-label {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  z-index: 2;
+  display: none;
+}
+
+.meta-bar {
+  display: flex;
+  align-items: center;
+  padding: 7px 0 5px;
+  border-top: 0.5px solid var(--color-border-tertiary);
+  margin-top: 6px;
+}
+
+.meta-bar button {
+  font-size: 11px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  margin-right: 16px;
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+.meta-bar button:hover { opacity: 0.4; }
+
+#canvas-wrap {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+#out-canvas { display: block; }
+
+#right-meta {
+  display: flex;
+  align-items: center;
+  padding: 7px 0 5px;
+  border-top: 0.5px solid var(--color-border-tertiary);
+  margin-top: 6px;
+  width: 100%;
+}
+#right-meta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#download-btn {
+  font-size: 11px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  opacity: 1;
+  transition: opacity 0.15s;
+    letter-spacing: 0.04em;
+}
+#download-btn:hover { opacity: 0.4; }
+
+#clear-btn {
+  font-size: 11px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  opacity: 1;
+  transition: opacity 0.15s;
+    letter-spacing: 0.04em;
+}
+#clear-btn:hover { opacity: 0.4; }
+
+/* hover-reveal samples strip */
+#samples-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+#samples-hint {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 20px 20px;
+  border-top: 0.5px solid var(--color-border-tertiary);
+  background: var(--color-background-primary, #fff);
+  cursor: default;
+  transition: opacity 0.18s ease;
+}
+#samples-hint.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#samples-hint span {
+  font-family: 'area-normal', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+}
+
+#samples-panel {
+  background: var(--color-background-primary, #fff);
+  border-top: 0.5px solid var(--color-border-tertiary);
+  padding: 0 20px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1), padding 0.28s ease, opacity 0.22s ease;
+}
+#samples-panel.visible {
+  max-height: 120px;
+  padding: 0px 20px 20px;
+  opacity: 1;
+}
+
+#samples-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 8px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  margin-bottom: 12px;
+}
+.scroll-btn {
+  font-size: 11px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  line-height: 1;
+  opacity: 1;
+  transition: opacity 0.15s;
+    letter-spacing: 0.04em;
+}
+.scroll-btn:hover { opacity: 0.4; }
+.scroll-btn:disabled { opacity: 0.2; cursor: default; }
+
+#samples-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#samples-wrap::-webkit-scrollbar { display: none; }
+
+#samples {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: max-content;
+}
+
+.sample-thumb {
+  position: relative;
+  width: 120px;
+  height: 68px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  background: #000;
+  border: 0.5px solid transparent;
+}
+.sample-thumb:hover { border-color: var(--color-border-secondary); }
+.sample-thumb.active { border-color: var(--color-text-primary); }
+.sample-thumb video {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#key-overlay-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+</style>
+
+<div id="app">
+
+  <div id="topbar">
+    <span id="topbar-title">KEYFRAME</span>
+    <button id="about-btn" onclick="document.getElementById('about-panel').classList.toggle('open')">about</button>
+  </div>
+
+  <div id="about-panel">
+    <button id="about-close-btn">→</button>
+    <p>A typesetting tool that turns typing into a form of image-making. Upload a video and a keyboard layout is placed over it. When you press a key, the tool captures a small part of the video at that moment. Each capture is placed into a grid on the right. As you keep typing, the grid fills up and forms a new image. The final result depends on the letters typed and the moment each key is pressed.</p>
+  </div>
+
+  <div id="studio">
+    <div id="left">
+      <div id="video-wrap">
+        <video id="main-video" playsinline muted loop></video>
+          <div id="key-overlay-bg"></div>
+        <canvas id="key-overlay"></canvas>
+        <span id="sample-label"></span>
+      </div>
+      <div class="meta-bar">
+        <button id="reupload-btn">upload</button>
+        <input id="file-in-reupload" type="file" accept="video/*" style="display:none">
+      </div>
+    </div>
+
+    <div id="right">
+      <div id="canvas-wrap">
+        <canvas id="out-canvas"></canvas>
+      </div>
+      <div id="right-meta">
+        <div id="right-meta-inner">
+          <button id="clear-btn">clear</button>
+          <button id="download-btn">save image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- hover-reveal samples strip -->
+<div id="samples-section">
+  <div id="samples-hint">
+    <span>samples</span>
+    <span>↑</span>
+  </div>
+  <div id="samples-panel">
+    <div id="samples-nav">
+      <button class="scroll-btn" id="arrow-left">←</button>
+      <button class="scroll-btn" id="arrow-right">→</button>
+    </div>
+    <div id="samples-wrap">
+      <div id="samples">
+        <div class="sample-thumb" data-src="video1.mov"><video src="video1.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video2.mov"><video src="video2.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video3.mov"><video src="video3.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video4.mov"><video src="video4.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video5.mov"><video src="video5.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video6.mov"><video src="video6.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video7.mov"><video src="video7.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video8.mov"><video src="video8.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video9.mov"><video src="video9.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video10.mov"><video src="video10.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video11.mov"><video src="video11.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video12.mov"><video src="video12.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video13.mov"><video src="video13.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video14.mov"><video src="video14.mov" muted loop autoplay playsinline></video></div>
+        <div class="sample-thumb" data-src="video15.mov"><video src="video15.mov" muted loop autoplay playsinline></video></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SAMPLES = [
+  'video1.mov','video2.mov','video3.mov','video4.mov','video5.mov',
+  'video6.mov','video7.mov','video8.mov','video9.mov','video10.mov','video11.mov','video12.mov','video13.mov','video14.mov','video15.mov'
+];
+
+const ROWS = [
+  [{k:'`',w:1},{k:'1',w:1},{k:'2',w:1},{k:'3',w:1},{k:'4',w:1},{k:'5',w:1},{k:'6',w:1},{k:'7',w:1},{k:'8',w:1},{k:'9',w:1},{k:'0',w:1},{k:'-',w:1},{k:'=',w:1},{k:'⌫',w:2}],
+  [{k:'Tab',w:1.5},{k:'Q',w:1},{k:'W',w:1},{k:'E',w:1},{k:'R',w:1},{k:'T',w:1},{k:'Y',w:1},{k:'U',w:1},{k:'I',w:1},{k:'O',w:1},{k:'P',w:1},{k:'[',w:1},{k:']',w:1},{k:'\\',w:1.5}],
+  [{k:'Caps',w:1.75},{k:'A',w:1},{k:'S',w:1},{k:'D',w:1},{k:'F',w:1},{k:'G',w:1},{k:'H',w:1},{k:'J',w:1},{k:'K',w:1},{k:'L',w:1},{k:';',w:1},{k:"'",w:1},{k:'Enter',w:2.25}],
+  [{k:'Shift',w:2.25},{k:'Z',w:1},{k:'X',w:1},{k:'C',w:1},{k:'V',w:1},{k:'B',w:1},{k:'N',w:1},{k:'M',w:1},{k:',',w:1},{k:'.',w:1},{k:'/',w:1},{k:'Shift',w:2.75}],
+  [{k:'Ctrl',w:1.25},{k:'Win',w:1.25},{k:'Alt',w:1.25},{k:'Space',w:6.25},{k:'Alt',w:1.25},{k:'Fn',w:1.25},{k:'Ctrl',w:1.25}]
+];
+
+const TOTAL_UNITS = 14.5;
+const NUM_ROWS = ROWS.length;
+const CELL_COLS = 15;
+const CELL_ROWS = 12;
+const MAX_TILES = CELL_COLS * CELL_ROWS;
+const OUT_W = 1500;
+const TILE_W = Math.floor(OUT_W / CELL_COLS);
+const TILE_H = Math.floor((OUT_W * (11/8.5)) / CELL_ROWS);
+const OUT_H = TILE_H * CELL_ROWS;
+const FRAME_W = 1920;
+const FRAME_H = 1080;
+
+let videoEl, overlayCanvas, overlayCtx, outCanvas, outCtx;
+let tileCount = 0;
+let cellW, cellH;
+let videoReady = false;
+let isSample = false;
+
+function init(){
+  videoEl = document.getElementById('main-video');
+  overlayCanvas = document.getElementById('key-overlay');
+  overlayCtx = overlayCanvas.getContext('2d');
+  outCanvas = document.getElementById('out-canvas');
+  outCtx = outCanvas.getContext('2d');
+
+  outCanvas.width = OUT_W;
+  outCanvas.height = OUT_H;
+  outCtx.fillStyle = '#ffffff';
+  outCtx.fillRect(0,0,OUT_W,OUT_H);
+
+  document.getElementById('reupload-btn').addEventListener('click', () => {
+    document.getElementById('file-in-reupload').click();
+  });
+  document.getElementById('file-in-reupload').addEventListener('change', loadVideo);
+  document.getElementById('clear-btn').addEventListener('click', clearCanvas);
+  document.getElementById('download-btn').addEventListener('click', downloadImage);
+  document.addEventListener('keydown', onKey);
+  document.getElementById('about-close-btn').addEventListener('click', () => {
+    document.getElementById('about-panel').classList.remove('open');
+  });
+
+  document.querySelectorAll('.sample-thumb').forEach(thumb => {
+    thumb.addEventListener('click', () => loadSample(thumb.dataset.src, thumb));
+  });
+
+  // hover-reveal samples panel
+  const section = document.getElementById('samples-section');
+  const panel = document.getElementById('samples-panel');
+  const hint = document.getElementById('samples-hint');
+  let showTimer, hideTimer;
+
+  section.addEventListener('mouseenter', () => {
+    clearTimeout(hideTimer);
+    showTimer = setTimeout(() => {
+      panel.classList.add('visible');
+      hint.classList.add('hidden');
+    }, 150);
+  });
+  section.addEventListener('mouseleave', () => {
+    clearTimeout(showTimer);
+    hideTimer = setTimeout(() => {
+      panel.classList.remove('visible');
+      hint.classList.remove('hidden');
+    }, 0);
+  });
+
+  // scroll arrows
+  const wrap = document.getElementById('samples-wrap');
+  const arrowL = document.getElementById('arrow-left');
+  const arrowR = document.getElementById('arrow-right');
+  const scrollAmt = 400;
+
+  function updateArrows(){
+    arrowL.disabled = wrap.scrollLeft <= 0;
+    arrowR.disabled = wrap.scrollLeft >= wrap.scrollWidth - wrap.clientWidth - 1;
+  }
+  arrowL.addEventListener('click', () => {
+    wrap.scrollBy({ left: -scrollAmt, behavior: 'smooth' });
+  });
+  arrowR.addEventListener('click', () => {
+    wrap.scrollBy({ left: scrollAmt, behavior: 'smooth' });
+  });
+  wrap.addEventListener('scroll', updateArrows);
+  updateArrows();
+
+  // auto-load random sample
+  const randomSrc = SAMPLES[Math.floor(Math.random() * SAMPLES.length)];
+  const randomThumb = document.querySelector(`.sample-thumb[data-src="${randomSrc}"]`);
+  loadSample(randomSrc, randomThumb);
+
+  matchCanvasHeight();
+}
+
+function loadSample(src, thumbEl){
+  isSample = true;
+  document.getElementById('sample-label').style.display = 'block';
+  document.querySelectorAll('.sample-thumb').forEach(t => t.classList.remove('active'));
+  if(thumbEl) thumbEl.classList.add('active');
+  videoEl.src = src;
+  videoEl.loop = true;
+  videoEl.muted = true;
+  videoEl.addEventListener('loadedmetadata', onVideoReady, {once:true});
+}
+
+function loadVideo(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  isSample = false;
+  document.getElementById('sample-label').style.display = 'none';
+  document.querySelectorAll('.sample-thumb').forEach(t => t.classList.remove('active'));
+  videoEl.src = URL.createObjectURL(file);
+  videoEl.loop = true;
+  videoEl.muted = true;
+  videoEl.addEventListener('loadedmetadata', onVideoReady, {once:true});
+}
+
+function onVideoReady(){
+  videoReady = true;
+  overlayCanvas.width = FRAME_W;
+  overlayCanvas.height = FRAME_H;
+  cellW = FRAME_W / TOTAL_UNITS;
+  cellH = FRAME_H / NUM_ROWS;
+  videoEl.play();
+  requestAnimationFrame(matchCanvasHeight);
+  drawOverlay();
+}
+
+function matchCanvasHeight(){
+  const videoH = document.getElementById('video-wrap').getBoundingClientRect().height;
+  if(videoH === 0){ requestAnimationFrame(matchCanvasHeight); return; }
+  const displayW = Math.round(videoH * (8.5/11));
+  const canvasWrap = document.getElementById('canvas-wrap');
+  canvasWrap.style.height = videoH + 'px';
+  canvasWrap.style.width = displayW + 'px';
+  outCanvas.style.height = videoH + 'px';
+  outCanvas.style.width = displayW + 'px';
+  document.getElementById('right-meta-inner').style.width = displayW + 'px';
+}
+
+function drawOverlay(flashLabel){
+  if(!videoReady) return;
+  overlayCtx.clearRect(0,0,FRAME_W,FRAME_H);
+  overlayCtx.lineWidth = 0.8;
+  overlayCtx.font = `${Math.round(cellH*0.26)}px sans-serif`;
+  overlayCtx.textAlign = 'center';
+  overlayCtx.textBaseline = 'middle';
+  let y = 0;
+  ROWS.forEach(row => {
+    let x = 0;
+    row.forEach(key => {
+      const kw = key.w * cellW;
+      const isFlash = flashLabel && key.k === flashLabel;
+      overlayCtx.strokeStyle = isFlash ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.22)';
+      overlayCtx.fillStyle = isFlash ? 'rgba(255,255,255,0.28)' : 'transparent';
+      overlayCtx.fillRect(x, y, kw, cellH);
+      overlayCtx.strokeRect(x+0.5, y+0.5, kw-1, cellH-1);
+      overlayCtx.fillStyle = isFlash ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.38)';
+      overlayCtx.fillText(key.k, x+kw/2, y+cellH/2);
+      x += kw;
+    });
+    y += cellH;
+  });
+}
+
+function findKey(keyStr){
+  const keyMap = {'backspace':'⌫','tab':'Tab','capslock':'Caps','enter':'Enter','shift':'Shift','control':'Ctrl','alt':'Alt','meta':'Win',' ':'Space'};
+  const mapped = keyStr.length === 1 ? keyStr.toUpperCase() : (keyMap[keyStr.toLowerCase()] || keyStr);
+  for(let ri=0; ri<ROWS.length; ri++){
+    let x = 0;
+    for(let ki=0; ki<ROWS[ri].length; ki++){
+      const key = ROWS[ri][ki];
+      const kw = key.w * cellW;
+      if(key.k === mapped || key.k.toUpperCase() === mapped.toUpperCase()){
+        const clampedX = Math.min(x, FRAME_W - 1);
+        const clampedW = Math.min(kw, FRAME_W - clampedX);
+        return {x: clampedX, y: ri*cellH, w: clampedW, h: cellH, label: key.k};
+      }
+      x += kw;
+    }
+  }
+  return null;
+}
+
+function onKey(e){
+  if(!videoReady) return;
+  e.preventDefault();
+
+  // space = pause/play toggle
+  if(e.key === ' '){
+    if(videoEl.paused){ videoEl.play(); } else { videoEl.pause(); }
+    return;
+  }
+
+  const ki = findKey(e.key);
+  if(!ki) return;
+  captureRegion(ki);
+  drawOverlay(ki.label);
+  setTimeout(()=>drawOverlay(), 180);
+}
+
+function captureRegion(ki){
+  if(tileCount >= MAX_TILES) return;
+  const vw = videoEl.videoWidth;
+  const vh = videoEl.videoHeight;
+  const tmp = document.createElement('canvas');
+  tmp.width = FRAME_W;
+  tmp.height = FRAME_H;
+  const ctx = tmp.getContext('2d');
+  const videoRatio = vw / vh;
+  const frameRatio = FRAME_W / FRAME_H;
+  let drawW, drawH, drawX, drawY;
+  if(videoRatio > frameRatio){
+    drawH = FRAME_H; drawW = FRAME_H * videoRatio;
+    drawX = (FRAME_W - drawW) / 2; drawY = 0;
+  } else {
+    drawW = FRAME_W; drawH = FRAME_W / videoRatio;
+    drawX = 0; drawY = (FRAME_H - drawH) / 2;
+  }
+  ctx.drawImage(videoEl, drawX, drawY, drawW, drawH);
+  const srcX = ki.x, srcY = ki.y, srcW = ki.w, srcH = ki.h;
+  const tileRatio = TILE_W / TILE_H;
+  const srcRatio = srcW / srcH;
+  let cropX, cropY, cropW, cropH;
+  if(srcRatio > tileRatio){
+    cropH = srcH; cropW = srcH * tileRatio;
+    cropX = srcX + (srcW - cropW) / 2; cropY = srcY;
+  } else {
+    cropW = srcW; cropH = srcW / tileRatio;
+    cropX = srcX; cropY = srcY + (srcH - cropH) / 2;
+  }
+  const col = tileCount % CELL_COLS;
+  const row = Math.floor(tileCount / CELL_COLS);
+  outCtx.drawImage(tmp, cropX, cropY, cropW, cropH, col*TILE_W, row*TILE_H, TILE_W, TILE_H);
+  tileCount++;
+}
+
+function clearCanvas(){
+  outCtx.fillStyle='#ffffff';
+  outCtx.fillRect(0,0,OUT_W,OUT_H);
+  tileCount=0;
+}
+
+function downloadImage(){
+  const a=document.createElement('a');
+  a.href=outCanvas.toDataURL('image/png');
+  a.download='typeset.png';
+  a.click();
+}
+
+window.addEventListener('load', ()=>{ init(); matchCanvasHeight(); });
+window.addEventListener('resize', ()=>{ matchCanvasHeight(); });
+</script>
